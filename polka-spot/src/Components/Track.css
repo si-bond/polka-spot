@@ -4,3 +4,19 @@
     align-items: center;
     width: 100%;
 }
+
+.track{
+    margin-bottom: 20px;
+}
+
+h3, p{
+    margin: 0;
+}
+
+h3{
+    font-size: 0.9em;
+}
+
+p{
+    font-size: 0.6em;
+}

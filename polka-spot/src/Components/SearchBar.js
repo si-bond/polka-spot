@@ -8,7 +8,7 @@ function SearchBar(){
         <div>
             <input 
                 type="text" 
-                class="search-bar" 
+                className="search-bar" 
                 value={searchBarText}
             />
             <button>Search</button>
