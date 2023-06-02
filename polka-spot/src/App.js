@@ -1,22 +1,17 @@
 import logo from './logo.svg';
 import './App.css';
+import songData from './songData'
 
 function App() {
+
+  console.log(songData.artists.items[1].name)
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          PolkaSpot
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
       </header>
     </div>
   );
