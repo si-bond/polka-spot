@@ -1,28 +1,43 @@
-import React from 'react'
-import Track from './Track'
+import React, {useState} from 'react'
+import PlaylistTrack from './PlaylistTrack'
 
-function SearchResults({songData, addSongToPlaylist}){
+function Playlist({playlistData, removeSongFromPlaylist}){
 
    // console.log(songData)
+   const [playListName, setPlaylistName] = useState("")
 
-    const songResults = songData.tracks.items.map(track => {
+   function onChange(e){
+    const changedValue = e.target.value
+    setPlaylistName(changedValue)
+    console.log(changedValue)
+   }
+
+    const playlistTracks = playlistData.map(track => {
+ 
         return (
-            <Track 
+            <PlaylistTrack 
                 songName={track.name}
-                artist={track.artists[0].name}
+                artist={track.artist}
                 key={track.id}
                 id={track.id}
-                addSongToPlaylist={addSongToPlaylist}
+                removeSongFromPlaylist={removeSongFromPlaylist}
             />
         )
     })
 
     return (
         <div>
-           <h2>Results</h2>
-           {songResults}           
+           <h2>Playlist</h2>
+           <input 
+                type="text" 
+                value={playListName} 
+                onChange={onChange}
+                placeholder="Playlist Name"
+            />
+           <button>Add Playlist</button>
+           {playlistTracks}           
         </div>
     )
 }
 
-export default SearchResults 
+export default Playlist 
