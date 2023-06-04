@@ -29,7 +29,9 @@ function App() {
     console.log(searchParameter)
 //
     //const response = await fetch("https://swapi.dev/api/people/1")
-    const response = await fetch("https://accounts.spotify.com/authorize")
+    //const response = await fetch("https://accounts.spotify.com/authorize")
+    const response = await fetch("https://accounts.spotify.com/api/token")
+
     const json = await response.json()
     console.log(json)
 
