@@ -8,11 +8,10 @@ function App() {
 
   const [playList, setPlaylist] = useState([])
   const [searchMode, setSearchMode] = useState(true)
+  const [playlistMode, setPlaylistMode] = useState(true)
 
   function addSongToPlaylist(name, artist, id){
-
     const newPlaylistEntry = {name: name, artist: artist, id: id}
-
     setPlaylist(prevPlaylist => {
       if(prevPlaylist.some(track => track.id===id)){
         return [...prevPlaylist]
@@ -40,8 +39,10 @@ function App() {
 
     if(buttonClicked==="search-button"){
       setSearchMode(true)
+      setPlaylistMode(false)
     } else if(buttonClicked==="playlist-button"){
       setSearchMode(false)
+      setPlaylistMode(true)
     }
   }
 
@@ -55,11 +56,8 @@ function App() {
           <button id="playlist-button" onClick={handleModeChange}>Playlist</button>
         </div>
         <div className="container">
-          {
-            searchMode ? 
-            <SearchResults songData={songData} addSongToPlaylist={addSongToPlaylist} getNewSearch={getNewSearch}/>
-            :
-            <Playlist 
+          {searchMode&&<SearchResults songData={songData} addSongToPlaylist={addSongToPlaylist} getNewSearch={getNewSearch}/>}
+          {playlistMode&&<Playlist 
                 playlistData={playList} 
                 removeSongFromPlaylist={removeSongFromPlaylist}
                 addNewPlaylist={addNewPlaylist}
