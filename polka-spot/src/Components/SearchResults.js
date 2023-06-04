@@ -1,7 +1,8 @@
 import React from 'react'
 import Track from './Track'
+import SearchBar from './SearchBar'
 
-function SearchResults({songData, addSongToPlaylist}){
+function SearchResults({songData, addSongToPlaylist, getNewSearch}){
 
    // console.log(songData)
 
@@ -18,8 +19,9 @@ function SearchResults({songData, addSongToPlaylist}){
     })
 
     return (
-        <div>
-           <h2>Results</h2>
+        <div className="search-results">
+           <h2>Search</h2>
+           <SearchBar getNewSearch={getNewSearch}/>
            {songResults}           
         </div>
     )

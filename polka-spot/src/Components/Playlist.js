@@ -1,15 +1,20 @@
 import React, {useState} from 'react'
 import PlaylistTrack from './PlaylistTrack'
 
-function Playlist({playlistData, removeSongFromPlaylist}){
+function Playlist({playlistData, removeSongFromPlaylist, addNewPlaylist}){
 
    // console.log(songData)
    const [playListName, setPlaylistName] = useState("")
 
-   function onChange(e){
-    const changedValue = e.target.value
+   function handleChange(event){
+    const changedValue = event.target.value
+
     setPlaylistName(changedValue)
-    console.log(changedValue)
+
+   }
+
+   function handleAddPlaylistClick(){
+        addNewPlaylist(playListName)
    }
 
     const playlistTracks = playlistData.map(track => {
@@ -26,15 +31,15 @@ function Playlist({playlistData, removeSongFromPlaylist}){
     })
 
     return (
-        <div>
+        <div className="playlist">
            <h2>Playlist</h2>
            <input 
                 type="text" 
                 value={playListName} 
-                onChange={onChange}
+                onChange={handleChange}
                 placeholder="Playlist Name"
             />
-           <button>Add Playlist</button>
+           <button onClick={handleAddPlaylistClick}>Add Playlist</button>
            {playlistTracks}           
         </div>
     )
