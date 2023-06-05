@@ -1,10 +1,10 @@
 import React from 'react'
 import './Track.css';
 
-function Track({songName, artist, id, addSongToPlaylist}){
+function Track({songName, artist, uri, addSongToPlaylist}){
 
     function handleClick(){
-        addSongToPlaylist(songName, artist, id)
+        addSongToPlaylist(songName, artist, uri)
     }
     
     return(

@@ -5,24 +5,26 @@ import SearchBar from './SearchBar'
 function SearchResults({songData, addSongToPlaylist, getNewSearch}){
 
    // console.log(songData)
-
-    const songResults = songData.tracks.items.map(track => {
-        return (
-            <Track 
-                songName={track.name}
-                artist={track.artists[0].name}
-                key={track.id}
-                id={track.id}
-                addSongToPlaylist={addSongToPlaylist}
-            />
-        )
-    })
+   let songResults = []
+    if(songData){
+        songResults = songData.tracks.items.map(track => {
+            return (
+                <Track 
+                    songName={track.name}
+                    artist={track.artists[0].name}
+                    key={track.id}
+                    uri={track.uri}
+                    addSongToPlaylist={addSongToPlaylist}
+                />
+            )
+        })
+    }
 
     return (
         <div className="search-results">
            <h2>Search</h2>
            <SearchBar getNewSearch={getNewSearch}/>
-           {songResults}           
+           {songData&&songResults}           
         </div>
     )
 }

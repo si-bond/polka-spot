@@ -24,7 +24,7 @@ function Playlist({playlistData, removeSongFromPlaylist, addNewPlaylist}){
                 songName={track.name}
                 artist={track.artist}
                 key={track.id}
-                id={track.id}
+                uri={track.uri}
                 removeSongFromPlaylist={removeSongFromPlaylist}
             />
         )

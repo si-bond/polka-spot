@@ -1,6 +1,6 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import './App.css';
-import songData from './songData'
+//import songData from './songData'
 import SearchResults from './Components/SearchResults'
 import Playlist from './Components/Playlist'
 
@@ -10,14 +10,17 @@ const redirectUri = 'http://localhost:3000/callback/';
 
 function App() {
 
+  const [songData, setSongData] = useState("")
   const [playList, setPlaylist] = useState([])
   const [searchMode, setSearchMode] = useState(true)
   const [playlistMode, setPlaylistMode] = useState(true)
+  const [accessToken, setAccessToken] = useState("")
+  const [accessTokenExpire, setAccessTokenExpire] = useState("")  
 
-  function addSongToPlaylist(name, artist, id){
-    const newPlaylistEntry = {name: name, artist: artist, id: id}
+  function addSongToPlaylist(name, artist, uri){
+    const newPlaylistEntry = {name: name, artist: artist, uri: uri}
     setPlaylist(prevPlaylist => {
-      if(prevPlaylist.some(track => track.id===id)){
+      if(prevPlaylist.some(track => track.id===uri)){
         return [...prevPlaylist]
       } else {
         return [newPlaylistEntry,...prevPlaylist]
@@ -26,57 +29,47 @@ function App() {
   }
 
 
-// const param = window.location.search
-// const urlParams = new URLSearchParams(param);
-//   console.log(urlParams.get('product'))
+  //Get params from url
+  useEffect(() => {
 
-  function removeSongFromPlaylist(id){
-    setPlaylist(prevPlaylist => prevPlaylist.filter(track => track.id!==id))
+    console.log("test")
+
+    const param = window.location.hash
+    const urlParams = new URLSearchParams(param);
+    setAccessToken(urlParams.get('#access_token'))
+    console.log(accessToken)
+  },[])
+
+
+  function removeSongFromPlaylist(uri){
+    setPlaylist(prevPlaylist => prevPlaylist.filter(track => track.uri!==uri))
   }
 
   async function getNewSearch(searchParameter){
     console.log(searchParameter)
+    let url = ""
 
-    let  url = 'https://accounts.spotify.com/authorize';
-    url += '?response_type=token';
-    url += '&client_id=' + clientId;
-    url += '&redirect_uri=' + redirectUri;
-    //Redirect to spotify login
-    window.location.href = url;
+    if(!accessToken){
+      url = 'https://accounts.spotify.com/authorize';
+      url += '?response_type=token';
+      url += '&client_id=' + clientId;
+      url += '&redirect_uri=' + redirectUri;
+      //Redirect to spotify login
+      window.location.href = url;
+    } else{
+      console.log("logged in")
+      url = `
+            https://api.spotify.com/v1/search?type=track&market=GB&q=
+            ${searchParameter}
+            &access_token=${accessToken}
+            `
 
+      const response = await fetch(url)
 
-
-
-    // const response = fetch(url, {
-    //     // headers: {
-    //     //   'Content-Type': 'application/x-www-form-urlencoded'
-    //     // },
-    //     redirect: 'follow',
-    //     method: 'GET',
-    //     mode: 'no-cors'
-    // })
-
-    //const json = await response.json()
-    //console.log(json)
-
-
-    //Get api token
-    // const url = 'https://accounts.spotify.com/api/token';
-    // const response = await fetch(url, {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/x-www-form-urlencoded'
-    //     },
-    //     body: 'grant_type=client_credentials&client_id=' + clientId + '&client_secret=' + clientSecret,
-    //     json: true
-    // });
-    // if (response.ok) {
-    //     const jsonResponse = await response.json();
-    //     console.log(jsonResponse);
-    // } else {
-    //     console.log(response.statusText);
-    //     throw new Error(`Request failed! Status code: ${response.status} ${response.statusText}`);
-    // }
+      const json = await response.json()
+      console.log(json)
+      setSongData(json)
+    }
 
   }
 
@@ -108,7 +101,12 @@ function App() {
           <button id="playlist-button" onClick={handleModeChange}>Playlist</button>
         </div>
         <div className="container">
-          {searchMode&&<SearchResults songData={songData} addSongToPlaylist={addSongToPlaylist} getNewSearch={getNewSearch}/>}
+          {searchMode&&<SearchResults 
+            songData={songData} 
+            addSongToPlaylist={addSongToPlaylist} 
+            getNewSearch={getNewSearch}
+            />
+          }
           {playlistMode&&<Playlist 
                 playlistData={playList} 
                 removeSongFromPlaylist={removeSongFromPlaylist}

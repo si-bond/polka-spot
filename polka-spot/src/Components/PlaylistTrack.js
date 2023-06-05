@@ -1,10 +1,10 @@
 import React from 'react'
 import './Track.css';
 
-function PlaylistTrack({songName, artist, id,removeSongFromPlaylist}){
+function PlaylistTrack({songName, artist, uri,removeSongFromPlaylist}){
 
     function handleClick(){
-        removeSongFromPlaylist(id)
+        removeSongFromPlaylist(uri)
     }
     
     return(
