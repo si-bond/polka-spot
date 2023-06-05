@@ -5,7 +5,6 @@ import SearchResults from './Components/SearchResults'
 import Playlist from './Components/Playlist'
 
 const clientId =  '601acf698e384e12b3846478ca604c80'
-const clientSecret = '8c99c97d04a84a658636f8178e3f30f5'
 const redirectUri = 'http://localhost:3000/callback/';
 
 function App() {
@@ -16,6 +15,7 @@ function App() {
   const [playlistMode, setPlaylistMode] = useState(true)
   const [accessToken, setAccessToken] = useState("")
   const [accessTokenExpire, setAccessTokenExpire] = useState("")  
+  const [userName, setUserName] = useState("")
 
   function addSongToPlaylist(name, artist, uri){
     const newPlaylistEntry = {name: name, artist: artist, uri: uri}
@@ -77,7 +77,20 @@ function App() {
   function addNewPlaylist(playlistName){
     console.log(playList)
     console.log(playlistName)
+
+    getPlaylists()
+
+
   }
+
+  async function getPlaylists(){
+    const response = await fetch(`https://api.spotify.com/v1/me/playlists?&access_token=${accessToken}`)
+
+    const json = await response.json()
+    console.log(json)
+
+  }
+
 
   function handleModeChange(event){
     const buttonClicked = event.target.id
