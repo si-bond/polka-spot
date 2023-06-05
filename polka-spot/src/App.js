@@ -15,7 +15,6 @@ function App() {
   const [playlistMode, setPlaylistMode] = useState(true)
   const [accessToken, setAccessToken] = useState("")
   const [accessTokenExpire, setAccessTokenExpire] = useState("")  
-  const [userName, setUserName] = useState("")
 
   function addSongToPlaylist(name, artist, uri){
     const newPlaylistEntry = {name: name, artist: artist, uri: uri}
