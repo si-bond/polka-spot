@@ -5,6 +5,7 @@ import SearchResults from './Components/SearchResults'
 import Playlist from './Components/Playlist'
 
 const clientId =  '601acf698e384e12b3846478ca604c80'
+const clientSecret = ''
 const redirectUri = 'http://localhost:3000/callback/';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
   const [playlistMode, setPlaylistMode] = useState(true)
   const [accessToken, setAccessToken] = useState("")
   const [accessTokenExpire, setAccessTokenExpire] = useState("")  
+  const [playlistData, setPlaylistData] = useState([])
 
   function addSongToPlaylist(name, artist, uri){
     const newPlaylistEntry = {name: name, artist: artist, uri: uri}
@@ -30,13 +32,10 @@ function App() {
 
   //Get params from url
   useEffect(() => {
-
-    console.log("test")
-
     const param = window.location.hash
     const urlParams = new URLSearchParams(param);
+
     setAccessToken(urlParams.get('#access_token'))
-    console.log(accessToken)
   },[])
 
 
@@ -72,22 +71,45 @@ function App() {
 
   }
 
+  console.log(accessToken)
 
   function addNewPlaylist(playlistName){
     console.log(playList)
     console.log(playlistName)
 
-    getPlaylists()
-
+    //getPlaylists()
+    createNewPlaylists()
 
   }
 
   async function getPlaylists(){
-    const response = await fetch(`https://api.spotify.com/v1/me/playlists?&access_token=${accessToken}`)
+    const url = `https://api.spotify.com/v1/me/playlists?&access_token=${accessToken}`
 
+    const response = await fetch(url)
     const json = await response.json()
-    console.log(json)
+    const playlists = json.items
+    console.log(playlists)
 
+    setPlaylistData(playlists)
+  }
+
+  async function createNewPlaylists(){
+    const url = `https://api.spotify.com/v1/me/playlists?&access_token=${accessToken}`
+    
+    const response = await fetch(url,{
+      data: {
+        "name": "New Playlist",
+        "description": "New playlist description",
+        "public": false
+      },
+      method: 'POST',
+     // headers: { 'Authorization': 'Basic ' + (new Buffer.from(clientId + ':' + clientSecret).toString('base64')) },
+    })
+    const json = await response.json()
+    const playlists = json.items
+    console.log(playlists)
+
+    setPlaylistData(playlists)
   }
 
 
