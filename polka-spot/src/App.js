@@ -14,7 +14,6 @@ function App() {
   const [playList, setPlaylist] = useState([])
   const [searchMode, setSearchMode] = useState(true)
   const [playlistMode, setPlaylistMode] = useState(true)
-  const [accessToken, setAccessToken] = useState("")
   const [playlistData, setPlaylistData] = useState([])
 
   function checkTokenValid(){
