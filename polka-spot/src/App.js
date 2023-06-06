@@ -49,22 +49,30 @@ function App() {
     let url = ""
 
     if(!accessToken){
+
       connectToSpotify()
+
     } else{
-      console.log("logged in")
-      url = `
-            https://api.spotify.com/v1/search?type=track&market=GB&q=
+
+      if(!searchParameter){
+        console.log("Please enter search parameter")
+        return
+      }
+
+      url = `https://api.spotify.com/v1/search?type=track&market=GB&q=
             ${searchParameter}
-            &access_token=${accessToken}
-            `
+            &access_token=${accessToken}`
 
-      const response = await fetch(url)
-
-      const json = await response.json()
-      console.log(json)
-      setSongData(json)
+      try {
+        const response = await fetch(url)
+        if(response.ok){
+          const jsonResponse = await response.json()
+          setSongData(jsonResponse)
+        }
+      } catch(error){
+        console.log(error)
+      }
     }
-
   }
 
   console.log(accessToken)
@@ -73,8 +81,8 @@ function App() {
     console.log(playList)
     console.log(playlistName)
 
-    //getPlaylists()
-    createNewPlaylists()
+    getPlaylists()
+    //createNewPlaylists()
   }
 
   function connectToSpotify(){
@@ -82,39 +90,58 @@ function App() {
       url += '?response_type=token';
       url += '&client_id=' + clientId;
       url += '&redirect_uri=' + redirectUri;
+
       //Redirect to spotify login
-      window.location.href = url;
+      try {
+        window.location.href = url;
+      } catch (error){
+        console.log(error)
+      }
+      
   }
 
 
+
+
   async function getPlaylists(){
-    const url = `https://api.spotify.com/v1/me/playlists?&access_token=${accessToken}`
+    const urlToFetch = `https://api.spotify.com/v1/me/playlists?&access_token=${accessToken}`
 
-    const response = await fetch(url)
-    const json = await response.json()
-    const playlists = json.items
-    console.log(playlists)
-
-    setPlaylistData(playlists)
+    try {
+      const response = await fetch(urlToFetch)
+      if(response.ok){     
+        const jsonResponse = await response.json()
+        const playlists = jsonResponse.items
+        console.log(playlists)
+        setPlaylistData(playlists)
+      }
+    } catch(error){
+      console.log(error)
+    }
   }
 
   async function createNewPlaylists(){
     const url = `https://api.spotify.com/v1/me/playlists?&access_token=${accessToken}`
     
-    const response = await fetch(url,{
-      data: {
-        "name": "New Playlist",
-        "description": "New playlist description",
-        "public": false
-      },
-      method: 'POST',
-     // headers: { 'Authorization': 'Basic ' + (new Buffer.from(clientId + ':' + clientSecret).toString('base64')) },
-    })
-    const json = await response.json()
-    const playlists = json.items
-    console.log(playlists)
+    try{
+      const response = await fetch(url,{
+        data: {
+          "name": "New Playlist",
+          "description": "New playlist description",
+          "public": false
+        },
+        method: 'POST',
+      // headers: { 'Authorization': 'Basic ' + (new Buffer.from(clientId + ':' + clientSecret).toString('base64')) },
+      })
+      if(response.ok){
+        const jsonResponse = await response.json()
+        const playlists = jsonResponse.items
+        console.log(playlists)
+        setPlaylistData(playlists)
+      }  
+    } catch(error){
+      console.log(error)
+    }
 
-    setPlaylistData(playlists)
   }
 
 
