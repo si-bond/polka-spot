@@ -46,7 +46,7 @@ function Playlist({ playlistData,
     })
 
     const playlistDropdown = playlistList.map(playlist => {
-        return <option value={playlist.uri}>{playlist.name}</option>
+        return <option value={playlist.id}>{playlist.name}</option>
     })
 
     return (

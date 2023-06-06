@@ -15,6 +15,8 @@ function App() {
   const [playlistMode, setPlaylistMode] = useState(true)
   const [playlistList, setPlaylistList] = useState([])
 
+  console.log(playList)
+
   function checkTokenValid(){
     //Read token from hash url parameters
     const urlHashString = window.location.hash
@@ -67,7 +69,7 @@ function App() {
     url += '?response_type=token';
     url += '&client_id=' + clientId;
     url += '&redirect_uri=' + redirectUri;
-    url += '&scope=playlist-modify-public playlist-modify-private';
+    url += '&scope=playlist-modify-public playlist-modify-private playlist-read-private playlist-read-public';
     
 
     //Redirect to spotify login
@@ -224,10 +226,27 @@ function App() {
   }
 
   async function getPlaylistTracks(playlistUri){
+ 
     console.log(playlistUri)
 
-    //https://api.spotify.com/v1/playlists/{playlist_id}/tracks
-    //GET
+    const accessToken = getValidToken()
+    const fetchUrl = `https://api.spotify.com/v1/playlists/${playlistUri}/tracks?access_token=${accessToken}`
+   
+    try{
+      const response = await fetch(fetchUrl)
+
+      if(response.ok){
+        const jsonResponse = await response.json()
+        console.log(jsonResponse)
+        const playlistTracks = jsonResponse.items.map(track => {
+          return {artist: track.track.artists[0].name, name: track.track.name, uri: track.track.uri}
+        })
+        console.log("playlists items")
+        setPlaylist(playlistTracks)
+      } 
+    } catch(error){
+      console.log(error)
+    }
 }
 
 
