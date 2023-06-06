@@ -20,6 +20,7 @@ function App() {
 
   function addSongToPlaylist(name, artist, uri){
     const newPlaylistEntry = {name: name, artist: artist, uri: uri}
+
     setPlaylist(prevPlaylist => {
       if(prevPlaylist.some(track => track.id===uri)){
         return [...prevPlaylist]
@@ -48,12 +49,7 @@ function App() {
     let url = ""
 
     if(!accessToken){
-      url = 'https://accounts.spotify.com/authorize';
-      url += '?response_type=token';
-      url += '&client_id=' + clientId;
-      url += '&redirect_uri=' + redirectUri;
-      //Redirect to spotify login
-      window.location.href = url;
+      connectToSpotify()
     } else{
       console.log("logged in")
       url = `
@@ -79,8 +75,17 @@ function App() {
 
     //getPlaylists()
     createNewPlaylists()
-
   }
+
+  function connectToSpotify(){
+      let url = 'https://accounts.spotify.com/authorize';
+      url += '?response_type=token';
+      url += '&client_id=' + clientId;
+      url += '&redirect_uri=' + redirectUri;
+      //Redirect to spotify login
+      window.location.href = url;
+  }
+
 
   async function getPlaylists(){
     const url = `https://api.spotify.com/v1/me/playlists?&access_token=${accessToken}`
@@ -134,6 +139,7 @@ function App() {
           <button id="search-button" onClick={handleModeChange}>Search</button>
           <button id="playlist-button" onClick={handleModeChange}>Playlist</button>
         </div>
+        {accessToken?
         <div className="container">
           {searchMode&&<SearchResults 
             songData={songData} 
@@ -147,7 +153,7 @@ function App() {
                 addNewPlaylist={addNewPlaylist}
             />
           }
-        </div>
+        </div>:<div>Please Connect to Spotify<button onClick={connectToSpotify}>Connect</button></div>}
       </header>
     </div>
   );
