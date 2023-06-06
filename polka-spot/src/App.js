@@ -20,13 +20,15 @@ function App() {
     const urlHashString = window.location.hash
     const urlHashParams = new URLSearchParams(urlHashString);
     const urlAccessToken = urlHashParams.get('#access_token')
-    const currentTime = new Date();
 
     //If url token present then store token & timestamp and clear url
     if(urlAccessToken){
+      const currentTime = new Date();
+
       localStorage.setItem("accessToken", urlAccessToken);
       localStorage.setItem("expiryToken", currentTime);
       window.location.hash = ""
+
       return urlAccessToken
     }
     
@@ -129,12 +131,10 @@ function App() {
   }
 
  
-  function addNewPlaylist(playlistName){
-    //console.log(playList)
-   // console.log(playlistName)
-
-    //getPlaylists()
-    createNewPlaylists(playlistName)
+  async function addNewPlaylist(playlistName){
+    const newPlaylistID = await createNewPlaylists(playlistName)
+    await addTrackToPlaylist(newPlaylistID)
+    getPlaylists()
   }
 
 
@@ -171,14 +171,6 @@ function App() {
   async function createNewPlaylists(playlistName){
     const accessToken = getValidToken()
     const fetchUrl = `https://api.spotify.com/v1/me/playlists`
-    
-
-    // const encodedData = window.btoa(clientId + ':' + clientSecret);
-    // console.log(encodedData)
-    // const authorizationHeaderString = 'Authorization: Basic ' + encodedData;
-    // console.log(authorizationHeaderString)
-
-    console.log(accessToken)
 
     try{
       const response = await fetch(fetchUrl,{
@@ -192,30 +184,23 @@ function App() {
         }),
       })
 
-      console.log(response)
-
       if(response.ok){
         const jsonResponse = await response.json()
 
         const playlistID = jsonResponse.id
-        
-        
-        console.log(jsonResponse)
-        console.log(playlistID)
-        addTrackToPlaylist(playlistID)
-        getPlaylists()
+        return playlistID
       } 
     } catch(error) {
-      
-      console.log(error.response)
+      console.log(error)
     }
-    
-    //
+
   }
 
   async function addTrackToPlaylist(playlistID){
     const accessToken = getValidToken()
     const fetchUrl = `https://api.spotify.com/v1/playlists/${playlistID}/tracks`
+   
+    const playlistUris = playList.map(track => track.uri)
 
     try{
       const response = await fetch(fetchUrl,{
@@ -224,9 +209,7 @@ function App() {
           'Authorization': 'Bearer ' + accessToken,
         },
         body: JSON.stringify({
-            "uris": [
-              "spotify:track:24BYTj1tb5ovZcnIbtdTYD"
-          ],
+            "uris": playlistUris,
           "position": 0
         })
       })
@@ -239,6 +222,13 @@ function App() {
       console.log(error)
     }
   }
+
+  async function getPlaylistTracks(playlistUri){
+    console.log(playlistUri)
+
+    //https://api.spotify.com/v1/playlists/{playlist_id}/tracks
+    //GET
+}
 
 
   function handleModeChange(event){
@@ -275,6 +265,7 @@ function App() {
                 removeSongFromPlaylist={removeSongFromPlaylist}
                 addNewPlaylist={addNewPlaylist}
                 playlistList={playlistList}
+                getPlaylistTracks={getPlaylistTracks}
             />
           }
         </div>:<div>Please Connect to Spotify<button onClick={connectToSpotify}>Connect</button></div>}

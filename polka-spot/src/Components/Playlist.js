@@ -1,7 +1,12 @@
 import React, {useState} from 'react'
 import PlaylistTrack from './PlaylistTrack'
 
-function Playlist({playlistData, removeSongFromPlaylist, addNewPlaylist, playlistList}){
+function Playlist({ playlistData, 
+                    removeSongFromPlaylist, 
+                    addNewPlaylist, 
+                    playlistList, 
+                    getPlaylistTracks
+                }){
 
    // console.log(songData)
    const [playListName, setPlaylistName] = useState("")
@@ -26,11 +31,6 @@ function Playlist({playlistData, removeSongFromPlaylist, addNewPlaylist, playlis
     }
     getPlaylistTracks(playlistUri)
    }
-
-   async function getPlaylistTracks(playlistUri){
-        console.log(playlistUri)
-   }
-
 
 
     const playlistTracks = playlistData.map(track => {
