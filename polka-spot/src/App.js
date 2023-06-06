@@ -5,7 +5,7 @@ import SearchResults from './Components/SearchResults'
 import Playlist from './Components/Playlist'
 
 const clientId =  '601acf698e384e12b3846478ca604c80'
-const clientSecret = ''
+const clientSecret = 'w'
 const redirectUri = 'http://localhost:3000/callback/';
 
 function App() {
@@ -19,38 +19,52 @@ function App() {
 
   function checkTokenValid(){
 
-    //Read token from param
+    //Read token from hash url parameters
     const urlHashString = window.location.hash
     const urlHashParams = new URLSearchParams(urlHashString);
     const urlAccessToken = urlHashParams.get('#access_token')
-    if(!urlAccessToken){
-      connectToSpotify()
-    }
-    //Read token from storage
-    const storedAccessToken = localStorage.getItem("accessToken");
-    //Read token expiry from storage
-    const expiryToken = localStorage.getItem("expiryToken");
     const currentTime = new Date();
 
-    //Check if token same as stored token
-    if(urlAccessToken===storedAccessToken){
-      const tokenTimestamp = new Date(expiryToken);
-      const tokenDuration = (currentTime - tokenTimestamp)/1000
-      //check if expired
-      if(tokenDuration>3600){
-        console.log("Token expired")
-        connectToSpotify()
-        return false
-      } else {
-        return urlAccessToken
-      }
-    } 
-    //If different store new token and set new expiry
-    else{
-      console.log("diff")
+    //If url token present then store token & timestamp and clear url
+    if(urlAccessToken){
       localStorage.setItem("accessToken", urlAccessToken);
       localStorage.setItem("expiryToken", currentTime);
+      window.location.hash = ""
       return urlAccessToken
+    }
+    
+    const storedAccessToken = isStoredTokenValid()
+     if(storedAccessToken){
+      return storedAccessToken
+    } else{
+      return false
+    }
+  }
+
+  function isStoredTokenValid(){
+    //Read token from storage
+    const storedAccessToken = localStorage.getItem("accessToken");
+
+    //Read token expiry from storage
+    const expiryToken = localStorage.getItem("expiryToken");
+    const tokenTimestamp = new Date(expiryToken);
+    const currentTime = new Date();
+    const tokenDuration = (currentTime - tokenTimestamp)/1000
+
+    if(storedAccessToken && tokenDuration<3600){
+      return storedAccessToken
+    } else{
+      return false
+    }
+  }
+
+  function getValidToken(){
+
+    const validToken = checkTokenValid()
+    if(validToken){
+      return validToken
+    } else{
+      connectToSpotify()
     }
   }
 
@@ -59,6 +73,8 @@ function App() {
     url += '?response_type=token';
     url += '&client_id=' + clientId;
     url += '&redirect_uri=' + redirectUri;
+    //url += '&scope=playlist-modify-public';
+    
 
     //Redirect to spotify login
     try {
@@ -119,20 +135,20 @@ function App() {
   
   }
 
-
+ 
   function addNewPlaylist(playlistName){
     console.log(playList)
     console.log(playlistName)
 
-    getPlaylists()
-    //createNewPlaylists()
+    //getPlaylists()
+    createNewPlaylists()
   }
 
 
 
   async function getPlaylists(){
     const accessToken = checkTokenValid()
-    const urlToFetch = `https://api.spotify.com/v1/me/playlists?&access_token=${accessToken}`
+    const urlToFetch = `https://api.spotify.com/v1/me/playlists?access_token=${accessToken}`
 
     try {
       const response = await fetch(urlToFetch)
@@ -150,17 +166,29 @@ function App() {
   }
 
   async function createNewPlaylists(){
-    const url = `https://api.spotify.com/v1/me/playlists?&access_token=${accessToken}`
+    const accessToken = checkTokenValid()
+    const url = `https://api.spotify.com/v1/users/31g4kwpzxmgndk6etsyqxtjbyuyi/playlists`
     
+
+    // const encodedData = window.btoa(clientId + ':' + clientSecret);
+    // console.log(encodedData)
+    // const authorizationHeaderString = 'Authorization: Basic ' + encodedData;
+    // console.log(authorizationHeaderString)
+
+    console.log(accessToken)
+
     try{
       const response = await fetch(url,{
         data: {
           "name": "New Playlist",
           "description": "New playlist description",
-          "public": false
+          "public": true
         },
         method: 'POST',
-      // headers: { 'Authorization': 'Basic ' + (new Buffer.from(clientId + ':' + clientSecret).toString('base64')) },
+        headers: {
+          'Authorization': 'Bearer ' + accessToken
+        },
+        contentType: 'application/json',
       })
       console.log(response)
       if(response.ok){
