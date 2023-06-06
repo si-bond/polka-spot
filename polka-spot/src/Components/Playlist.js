@@ -19,8 +19,21 @@ function Playlist({playlistData, removeSongFromPlaylist, addNewPlaylist, playlis
         addNewPlaylist(playListName)
    }
 
+   function handleSelect(event){
+    const playlistUri = event.target.value
+    if(!playlistUri){
+        return
+    }
+    getPlaylistTracks(playlistUri)
+   }
+
+   async function getPlaylistTracks(playlistUri){
+        console.log(playlistUri)
+   }
+
+
+
     const playlistTracks = playlistData.map(track => {
- 
         return (
             <PlaylistTrack 
                 songName={track.name}
@@ -33,13 +46,17 @@ function Playlist({playlistData, removeSongFromPlaylist, addNewPlaylist, playlis
     })
 
     const playlistDropdown = playlistList.map(playlist => {
-        return <option>{playlist.name}</option>
+        return <option value={playlist.uri}>{playlist.name}</option>
     })
 
     return (
         <div className="playlist">
            <h2>Playlist</h2>
-           <select name="playlists" id="playlist-select">
+           <select 
+                name="playlists" 
+                id="playlist-select"
+                onChange={handleSelect}
+            >
                 <option>New Playlist</option>
                 {playlistDropdown}
             </select>
