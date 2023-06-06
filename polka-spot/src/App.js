@@ -15,8 +15,65 @@ function App() {
   const [searchMode, setSearchMode] = useState(true)
   const [playlistMode, setPlaylistMode] = useState(true)
   const [accessToken, setAccessToken] = useState("")
-  const [accessTokenExpire, setAccessTokenExpire] = useState("")  
   const [playlistData, setPlaylistData] = useState([])
+
+  function checkTokenValid(){
+
+    //Read token from param
+    const urlHashString = window.location.hash
+    const urlHashParams = new URLSearchParams(urlHashString);
+    const urlAccessToken = urlHashParams.get('#access_token')
+    if(!urlAccessToken){
+      connectToSpotify()
+    }
+    //Read token from storage
+    const storedAccessToken = localStorage.getItem("accessToken");
+    //Read token expiry from storage
+    const expiryToken = localStorage.getItem("expiryToken");
+    const currentTime = new Date();
+
+    //Check if token same as stored token
+    if(urlAccessToken===storedAccessToken){
+      const tokenTimestamp = new Date(expiryToken);
+      const tokenDuration = (currentTime - tokenTimestamp)/1000
+      //check if expired
+      if(tokenDuration>3600){
+        console.log("Token expired")
+        connectToSpotify()
+        return false
+      } else {
+        return urlAccessToken
+      }
+    } 
+    //If different store new token and set new expiry
+    else{
+      console.log("diff")
+      localStorage.setItem("accessToken", urlAccessToken);
+      localStorage.setItem("expiryToken", currentTime);
+      return urlAccessToken
+    }
+  }
+
+  function connectToSpotify(){
+    let url = 'https://accounts.spotify.com/authorize';
+    url += '?response_type=token';
+    url += '&client_id=' + clientId;
+    url += '&redirect_uri=' + redirectUri;
+
+    //Redirect to spotify login
+    try {
+      window.location.href = url;
+    } catch (error){
+      console.log(error)
+    }  
+}
+
+  function check401InvalidCodeError(response){
+    const responseStatus = response.status
+    if(responseStatus===401){
+      connectToSpotify()
+    }
+  }
 
   function addSongToPlaylist(name, artist, uri){
     const newPlaylistEntry = {name: name, artist: artist, uri: uri}
@@ -30,27 +87,6 @@ function App() {
     })
   }
 
-
-  //Get params from url
-  useEffect(() => {
-    const param = window.location.hash
-    const urlParams = new URLSearchParams(param);
-    const token = urlParams.get('#access_token')
-
-    setAccessToken(token)
-
-    const hourTimer = 1000 * 60 * 60
-
-    console.log("start timer")
-    setTimeout(() => {
-      console.log(accessToken)
-      console.log("Token Expired")
-      setAccessToken("")
-    }, hourTimer);
-
-  },[])
-
-
   function removeSongFromPlaylist(uri){
     setPlaylist(prevPlaylist => prevPlaylist.filter(track => track.uri!==uri))
   }
@@ -58,30 +94,29 @@ function App() {
   async function getNewSearch(searchParameter){
     console.log(searchParameter)
     let url = ""
+    const accessToken = checkTokenValid()
 
-    if(!accessToken){
-      connectToSpotify()
-    } else{
-
-      if(!searchParameter){
-        console.log("Please enter search parameter")
-        return
-      }
-
-      url = `https://api.spotify.com/v1/search?type=track&market=GB&q=
-            ${searchParameter}
-            &access_token=${accessToken}`
-
-      try {
-        const response = await fetch(url)
-        if(response.ok){
-          const jsonResponse = await response.json()
-          setSongData(jsonResponse)
-        }
-      } catch(error){
-        console.log(error)
-      }
+    if(!searchParameter){
+      console.log("Please enter search parameter")
+      return
     }
+
+    url = `https://api.spotify.com/v1/search?type=track&market=GB&q=
+          ${searchParameter}
+          &access_token=${accessToken}`
+
+    try {
+      const response = await fetch(url)
+      if(response.ok){
+        const jsonResponse = await response.json()
+        setSongData(jsonResponse)
+      } else{
+        check401InvalidCodeError(response)
+      }
+    } catch(error){
+      console.log(error)
+    }
+  
   }
 
 
@@ -93,22 +128,10 @@ function App() {
     //createNewPlaylists()
   }
 
-  function connectToSpotify(){
-      let url = 'https://accounts.spotify.com/authorize';
-      url += '?response_type=token';
-      url += '&client_id=' + clientId;
-      url += '&redirect_uri=' + redirectUri;
 
-      //Redirect to spotify login
-      try {
-        window.location.href = url;
-      } catch (error){
-        console.log(error)
-      }
-      
-  }
 
   async function getPlaylists(){
+    const accessToken = checkTokenValid()
     const urlToFetch = `https://api.spotify.com/v1/me/playlists?&access_token=${accessToken}`
 
     try {
@@ -118,6 +141,8 @@ function App() {
         const playlists = jsonResponse.items
         console.log(playlists)
         setPlaylistData(playlists)
+      } else{
+        check401InvalidCodeError(response)
       }
     } catch(error){
       console.log(error)
@@ -137,14 +162,16 @@ function App() {
         method: 'POST',
       // headers: { 'Authorization': 'Basic ' + (new Buffer.from(clientId + ':' + clientSecret).toString('base64')) },
       })
+      console.log(response)
       if(response.ok){
         const jsonResponse = await response.json()
         const playlists = jsonResponse.items
         console.log(playlists)
         setPlaylistData(playlists)
-      }  
-    } catch(error){
-      console.log(error)
+      } 
+    } catch(error) {
+      
+      console.log(error.response)
     }
 
   }
@@ -171,7 +198,7 @@ function App() {
           <button id="search-button" onClick={handleModeChange}>Search</button>
           <button id="playlist-button" onClick={handleModeChange}>Playlist</button>
         </div>
-        {accessToken?
+        {checkTokenValid()?
         <div className="container">
           {searchMode&&<SearchResults 
             songData={songData} 
