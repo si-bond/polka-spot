@@ -35,8 +35,19 @@ function App() {
   useEffect(() => {
     const param = window.location.hash
     const urlParams = new URLSearchParams(param);
+    const token = urlParams.get('#access_token')
 
-    setAccessToken(urlParams.get('#access_token'))
+    setAccessToken(token)
+
+    const hourTimer = 1000 * 60 * 60
+
+    console.log("start timer")
+    setTimeout(() => {
+      console.log(accessToken)
+      console.log("Token Expired")
+      setAccessToken("")
+    }, hourTimer);
+
   },[])
 
 
@@ -49,9 +60,7 @@ function App() {
     let url = ""
 
     if(!accessToken){
-
       connectToSpotify()
-
     } else{
 
       if(!searchParameter){
@@ -75,7 +84,6 @@ function App() {
     }
   }
 
-  console.log(accessToken)
 
   function addNewPlaylist(playlistName){
     console.log(playList)
@@ -99,9 +107,6 @@ function App() {
       }
       
   }
-
-
-
 
   async function getPlaylists(){
     const urlToFetch = `https://api.spotify.com/v1/me/playlists?&access_token=${accessToken}`
