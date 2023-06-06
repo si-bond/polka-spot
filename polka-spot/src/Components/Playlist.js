@@ -1,10 +1,12 @@
 import React, {useState} from 'react'
 import PlaylistTrack from './PlaylistTrack'
 
-function Playlist({playlistData, removeSongFromPlaylist, addNewPlaylist}){
+function Playlist({playlistData, removeSongFromPlaylist, addNewPlaylist, playlistList}){
 
    // console.log(songData)
    const [playListName, setPlaylistName] = useState("")
+
+   console.log(playlistList)
 
    function handleChange(event){
     const changedValue = event.target.value
@@ -30,9 +32,17 @@ function Playlist({playlistData, removeSongFromPlaylist, addNewPlaylist}){
         )
     })
 
+    const playlistDropdown = playlistList.map(playlist => {
+        return <option>{playlist.name}</option>
+    })
+
     return (
         <div className="playlist">
            <h2>Playlist</h2>
+           <select name="playlists" id="playlist-select">
+                <option>New Playlist</option>
+                {playlistDropdown}
+            </select>
            <input 
                 type="text" 
                 value={playListName} 

@@ -1,11 +1,10 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState,useEffect} from 'react'
 import './App.css';
 //import songData from './songData'
 import SearchResults from './Components/SearchResults'
 import Playlist from './Components/Playlist'
 
 const clientId =  '601acf698e384e12b3846478ca604c80'
-const clientSecret = 'w'
 const redirectUri = 'http://localhost:3000/callback/';
 
 function App() {
@@ -14,10 +13,9 @@ function App() {
   const [playList, setPlaylist] = useState([])
   const [searchMode, setSearchMode] = useState(true)
   const [playlistMode, setPlaylistMode] = useState(true)
-  const [playlistData, setPlaylistData] = useState([])
+  const [playlistList, setPlaylistList] = useState([])
 
   function checkTokenValid(){
-
     //Read token from hash url parameters
     const urlHashString = window.location.hash
     const urlHashParams = new URLSearchParams(urlHashString);
@@ -32,12 +30,7 @@ function App() {
       return urlAccessToken
     }
     
-    const storedAccessToken = isStoredTokenValid()
-     if(storedAccessToken){
-      return storedAccessToken
-    } else{
-      return false
-    }
+    return isStoredTokenValid()
   }
 
   function isStoredTokenValid(){
@@ -72,7 +65,7 @@ function App() {
     url += '?response_type=token';
     url += '&client_id=' + clientId;
     url += '&redirect_uri=' + redirectUri;
-    //url += '&scope=playlist-modify-public';
+    url += '&scope=playlist-modify-public playlist-modify-private';
     
 
     //Redirect to spotify login
@@ -109,7 +102,7 @@ function App() {
   async function getNewSearch(searchParameter){
     console.log(searchParameter)
     let url = ""
-    const accessToken = checkTokenValid()
+    const accessToken = getValidToken()
 
     if(!searchParameter){
       console.log("Please enter search parameter")
@@ -124,6 +117,7 @@ function App() {
       const response = await fetch(url)
       if(response.ok){
         const jsonResponse = await response.json()
+        console.log(jsonResponse)
         setSongData(jsonResponse)
       } else{
         check401InvalidCodeError(response)
@@ -136,26 +130,32 @@ function App() {
 
  
   function addNewPlaylist(playlistName){
-    console.log(playList)
-    console.log(playlistName)
+    //console.log(playList)
+   // console.log(playlistName)
 
     //getPlaylists()
-    createNewPlaylists()
+    createNewPlaylists(playlistName)
   }
 
 
 
   async function getPlaylists(){
-    const accessToken = checkTokenValid()
-    const urlToFetch = `https://api.spotify.com/v1/me/playlists?access_token=${accessToken}`
-
+    const accessToken = getValidToken()
+  //  const urlToFetch = `https://api.spotify.com/v1/me/playlists?access_token=${accessToken}`
+    const urlToFetch = `https://api.spotify.com/v1/me/playlists`
     try {
-      const response = await fetch(urlToFetch)
+      const response = await fetch(urlToFetch,{
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': 'application/json',
+        },
+      })
       if(response.ok){     
         const jsonResponse = await response.json()
-        const playlists = jsonResponse.items
-        console.log(playlists)
-        setPlaylistData(playlists)
+        //const playlists = jsonResponse.items
+        console.log(jsonResponse)
+        setPlaylistList(jsonResponse.items)
       } else{
         check401InvalidCodeError(response)
       }
@@ -164,9 +164,13 @@ function App() {
     }
   }
 
-  async function createNewPlaylists(){
-    const accessToken = checkTokenValid()
-    const url = `https://api.spotify.com/v1/users/31g4kwpzxmgndk6etsyqxtjbyuyi/playlists`
+  useEffect(() => {
+    const playlistItems = getPlaylists()
+  },[])
+
+  async function createNewPlaylists(playlistName){
+    const accessToken = getValidToken()
+    const fetchUrl = `https://api.spotify.com/v1/me/playlists`
     
 
     // const encodedData = window.btoa(clientId + ':' + clientSecret);
@@ -177,30 +181,63 @@ function App() {
     console.log(accessToken)
 
     try{
-      const response = await fetch(url,{
-        data: {
-          "name": "New Playlist",
-          "description": "New playlist description",
-          "public": true
-        },
+      const response = await fetch(fetchUrl,{
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + accessToken
+          'Authorization': 'Bearer ' + accessToken,
         },
-        contentType: 'application/json',
+        body: JSON.stringify({
+          name: playlistName, 
+          public: true,
+        }),
       })
+
       console.log(response)
+
       if(response.ok){
         const jsonResponse = await response.json()
-        const playlists = jsonResponse.items
-        console.log(playlists)
-        setPlaylistData(playlists)
+
+        const playlistID = jsonResponse.id
+        
+        
+        console.log(jsonResponse)
+        console.log(playlistID)
+        addTrackToPlaylist(playlistID)
+        getPlaylists()
       } 
     } catch(error) {
       
       console.log(error.response)
     }
+    
+    //
+  }
 
+  async function addTrackToPlaylist(playlistID){
+    const accessToken = getValidToken()
+    const fetchUrl = `https://api.spotify.com/v1/playlists/${playlistID}/tracks`
+
+    try{
+      const response = await fetch(fetchUrl,{
+        method: "POST",
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+        },
+        body: JSON.stringify({
+            "uris": [
+              "spotify:track:24BYTj1tb5ovZcnIbtdTYD"
+          ],
+          "position": 0
+        })
+      })
+      if(response.ok){
+        const jsonResponse = await response.json()
+        console.log("add")
+        console.log(jsonResponse)
+      } 
+    } catch(error){
+      console.log(error)
+    }
   }
 
 
@@ -237,6 +274,7 @@ function App() {
                 playlistData={playList} 
                 removeSongFromPlaylist={removeSongFromPlaylist}
                 addNewPlaylist={addNewPlaylist}
+                playlistList={playlistList}
             />
           }
         </div>:<div>Please Connect to Spotify<button onClick={connectToSpotify}>Connect</button></div>}
