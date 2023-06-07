@@ -61,7 +61,7 @@ function Playlist({ playlistData,
             <PlaylistTrack 
                 songName={track.name}
                 artist={track.artist}
-                key={track.id}
+                key={track.uri}
                 uri={track.uri}
                 removeSongFromPlaylist={removeSongFromPlaylist}
             />
@@ -73,7 +73,7 @@ function Playlist({ playlistData,
     })
 
     return (
-        <div className="playlist">
+        <div className="playlist" id="playlist">
            <h2>Playlist</h2>
            <select 
                 name="playlists" 

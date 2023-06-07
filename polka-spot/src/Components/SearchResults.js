@@ -21,7 +21,7 @@ function SearchResults({songData, addSongToPlaylist, getNewSearch}){
     }
 
     return (
-        <div className="search-results">
+        <div className="search-results" id="search-results">
            <h2>Search</h2>
            <SearchBar getNewSearch={getNewSearch}/>
            {songData&&songResults}           

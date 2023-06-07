@@ -15,6 +15,10 @@ function App() {
   const [playlistMode, setPlaylistMode] = useState(true)
   const [playlistList, setPlaylistList] = useState([])
 
+  useEffect(() => {
+    const playlistItems = getPlaylists()
+  },[])
+
   function checkTokenValid(){
     //Read token from hash url parameters
     const urlHashString = window.location.hash
@@ -55,6 +59,7 @@ function App() {
   function getValidToken(){
 
     const validToken = checkTokenValid()
+
     if(validToken){
       return validToken
     } else{
@@ -172,9 +177,7 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    const playlistItems = getPlaylists()
-  },[])
+
 
   async function createNewPlaylists(playlistName){
     const accessToken = getValidToken()
@@ -246,9 +249,6 @@ function App() {
             public: true,
         })
       })
-      if(response.ok){
-        const jsonResponse = await response.json()
-      } 
     } catch(error){
       console.log(error)
     }
@@ -324,13 +324,15 @@ function App() {
 
   function handleModeChange(event){
     const buttonClicked = event.target.id
+    const searchListEl = document.getElementById("search-results")
+    const playlistListEl = document.getElementById("playlist")
 
     if(buttonClicked==="search-button"){
-      setSearchMode(true)
-      setPlaylistMode(false)
+      searchListEl.style.display = "block"
+      playlistListEl.style.display = "none"
     } else if(buttonClicked==="playlist-button"){
-      setSearchMode(false)
-      setPlaylistMode(true)
+      searchListEl.style.display = "none"
+      playlistListEl.style.display = "block"
     }
   }
 
@@ -339,19 +341,20 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h1>PolkaSpot</h1>
+        <h6>Spotify Playlist Manager</h6>
         <div className="button-container">
           <button id="search-button" onClick={handleModeChange}>Search</button>
           <button id="playlist-button" onClick={handleModeChange}>Playlist</button>
         </div>
         {checkTokenValid()?
         <div className="container">
-          {searchMode&&<SearchResults 
+          <SearchResults 
             songData={songData} 
             addSongToPlaylist={addSongToPlaylist} 
             getNewSearch={getNewSearch}
             />
-          }
-          {playlistMode&&<Playlist 
+          
+          <Playlist 
                 playlistData={playList} 
                 removeSongFromPlaylist={removeSongFromPlaylist}
                 addNewPlaylist={addNewPlaylist}
@@ -363,8 +366,9 @@ function App() {
                 updatePlaylist={updatePlaylist}
                 clearPlaylist={clearPlaylist}
             />
-          }
-        </div>:<div>Please Connect to Spotify<button onClick={connectToSpotify}>Connect</button></div>}
+          
+        </div>:
+        <div>Please Connect to Spotify<button onClick={connectToSpotify}>Connect</button></div>}
       </header>
     </div>
   );
