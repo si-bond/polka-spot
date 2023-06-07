@@ -1,11 +1,13 @@
 .App {
   text-align: center;
   height: 100vh;
+  box-sizing: border-box;
 }
 
 *{
   font-family: 'Montserrat', sans-serif;
 /* font-family: 'Roboto', sans-serif; */
+box-sizing: border-box;
 }
 
 .App-header {
@@ -39,9 +41,11 @@ h6{
   display: flex;
   justify-content: center;
   position: absolute;
-  top: 140px;
+  top: 138px;
   gap: 10px;
   border-radius: 5px;
+  margin: 10px 0px 0 0px;
+  box-sizing: border-box;
 }
 
 .connect-container{
@@ -53,6 +57,7 @@ h6{
   justify-content: center;
   width: 100%;
   gap: 10px;
+  box-sizing: border-box;
 }
 
 .connect-container button{
@@ -78,7 +83,7 @@ h6{
 }
 
 .search-results-container{
-  max-height: calc(100vh - 250px)
+  max-height: calc(100vh - 250px);
 }
 
 .playlist-container{
@@ -123,7 +128,7 @@ h6{
   padding: 10px;
   background-color: whitesmoke;
   color: #282c34;
-  border: 2px solid black;
+  border: 1px solid black;
 }
 
 @media only screen and (min-width: 1000px) {

@@ -74,7 +74,7 @@ function Playlist({ playlistData,
 
     return (
         <div className="playlist" id="playlist">
-           <h2>Playlist</h2>
+           <h2>Playlists</h2>
            Select Playlist<br />
            <select 
                 name="playlists" 

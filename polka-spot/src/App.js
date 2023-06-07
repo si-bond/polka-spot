@@ -358,7 +358,7 @@ function App() {
       </header>
       <div className="button-container">
           <button id="search-button" onClick={handleModeChange}>Search</button>
-          <button id="playlist-button" onClick={handleModeChange}>Playlist</button>
+          <button id="playlist-button" onClick={handleModeChange}>Playlists</button>
         </div>
       {checkTokenValid()?
         <div className="container">
