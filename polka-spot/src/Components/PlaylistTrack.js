@@ -13,7 +13,7 @@ function PlaylistTrack({songName, artist, uri,removeSongFromPlaylist}){
                 <h3>{songName}</h3>
                 <p>{artist}</p>
             </div>
-            <div className="add-to-playlist" onClick={handleClick}>-</div>
+            <button className="add-to-playlist" onClick={handleClick}>Remove from Playlist</button>
         </div>
     )
 }

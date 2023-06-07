@@ -4,13 +4,19 @@
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: start;
-  font-size: calc(10px + 2vmin);
   color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 180px;
+}
+header{
+  z-index: 2;
 }
 
 h1{
@@ -22,33 +28,50 @@ h6{
 }
 
 .container{
-  margin-top: 10px;
-  width: 90%;
+  width: 100%;
   display: flex;
-  justify-content: stretch;
-
+  justify-content: center;
+  position: absolute;
+  top: 180px;
   gap: 10px;
   border-radius: 5px;
 }
 
 .search-results, .playlist{
-  background-color: blue;
+  background-color: whitesmoke;
   flex-grow: 1;
   padding: 15px;
 }
 
-.search-results-container{
+.search-results-container, .playlistContainer{
   width: 100%;
+  margin-top: 20px;
+}
+
+.track{
+  padding: 5px 10px;
+  box-sizing: border-box;
+  text-align: left;
+  background-color: white;
+}
+
+.track button{
+  background-color: #282c34;
+  color: white;
+  padding: 5px 10px;
+  border: none;
 }
 
 .button-container{
-  width: 90%;
+  width: 100%;
+  margin: 15px;
 }
 
 .button-container button{
   width: 50%;
   padding: 10px;
-  background-color: aquamarine;
+  background-color: whitesmoke;
+  color: #282c34;
   border: 2px solid black;
 }
 
@@ -62,6 +85,9 @@ h6{
   }
   .playlist{
     display: block !important;
+  }
+  .App-header {
+    height: 110px;
   }
 }
 

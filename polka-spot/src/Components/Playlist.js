@@ -91,7 +91,9 @@ function Playlist({ playlistData,
             />
             <button onClick={handleClick}>{newPlaylist?"Add Playlist":"Update Playlist"}</button>
             {!newPlaylist&&<button onClick={deletePlay}>Delete</button>}
-           {playlistTracks}           
+            <div className="playlistContainer">
+             {playlistTracks}    
+             </div>       
         </div>
     )
 }

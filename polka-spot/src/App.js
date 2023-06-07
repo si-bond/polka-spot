@@ -354,30 +354,30 @@ function App() {
           <button id="search-button" onClick={handleModeChange}>Search</button>
           <button id="playlist-button" onClick={handleModeChange}>Playlist</button>
         </div>
-        {checkTokenValid()?
-        <div className="container">
-          <SearchResults 
-            songData={songData} 
-            addSongToPlaylist={addSongToPlaylist} 
-            getNewSearch={getNewSearch}
-            />
-          
-          <Playlist 
-                playlistData={playList} 
-                removeSongFromPlaylist={removeSongFromPlaylist}
-                addNewPlaylist={addNewPlaylist}
-                playlistList={playlistList}
-                getPlaylistTracks={getPlaylistTracks}
-                addTrackToPlaylist={addTrackToPlaylist}
-                updateTracksToPlaylist={updateTracksToPlaylist}
-                deletePlaylist={deletePlaylist}
-                updatePlaylist={updatePlaylist}
-                clearPlaylist={clearPlaylist}
-            />
-          
-        </div>:
-        <div>Please Connect to Spotify<button onClick={connectToSpotify}>Connect</button></div>}
       </header>
+      {checkTokenValid()?
+      <div className="container">
+        <SearchResults 
+          songData={songData} 
+          addSongToPlaylist={addSongToPlaylist} 
+          getNewSearch={getNewSearch}
+          />
+        
+        <Playlist 
+              playlistData={playList} 
+              removeSongFromPlaylist={removeSongFromPlaylist}
+              addNewPlaylist={addNewPlaylist}
+              playlistList={playlistList}
+              getPlaylistTracks={getPlaylistTracks}
+              addTrackToPlaylist={addTrackToPlaylist}
+              updateTracksToPlaylist={updateTracksToPlaylist}
+              deletePlaylist={deletePlaylist}
+              updatePlaylist={updatePlaylist}
+              clearPlaylist={clearPlaylist}
+          />
+        
+      </div>:
+      <div>Please Connect to Spotify<button onClick={connectToSpotify}>Connect</button></div>}
     </div>
   );
 }
