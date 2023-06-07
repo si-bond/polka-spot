@@ -24,7 +24,9 @@ function SearchResults({songData, addSongToPlaylist, getNewSearch}){
         <div className="search-results" id="search-results">
            <h2>Search</h2>
            <SearchBar getNewSearch={getNewSearch}/>
-           {songData&&songResults}           
+           <div className="search-results-container">
+                {songData&&songResults}      
+           </div>     
         </div>
     )
 }

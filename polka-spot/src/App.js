@@ -11,12 +11,10 @@ function App() {
 
   const [songData, setSongData] = useState("")
   const [playList, setPlaylist] = useState([])
-  const [searchMode, setSearchMode] = useState(true)
-  const [playlistMode, setPlaylistMode] = useState(true)
   const [playlistList, setPlaylistList] = useState([])
 
   useEffect(() => {
-    const playlistItems = getPlaylists()
+    getPlaylists()
   },[])
 
   function checkTokenValid(){
@@ -94,7 +92,7 @@ function App() {
     const newPlaylistEntry = {name: name, artist: artist, uri: uri}
 
     setPlaylist(prevPlaylist => {
-      if(prevPlaylist.some(track => track.id===uri)){
+      if(prevPlaylist.some(track => track.uri===uri)){
         return [...prevPlaylist]
       } else {
         return [newPlaylistEntry,...prevPlaylist]
@@ -142,12 +140,12 @@ function App() {
  
   async function addNewPlaylist(playlistName){
     const newPlaylistID = await createNewPlaylists(playlistName)
+
     if(playList.length>0){
         await addTrackToPlaylist(newPlaylistID)
     }
     
     getPlaylists()
-    //setPlaylist([])
   }
 
 
@@ -166,8 +164,6 @@ function App() {
       })
       if(response.ok){     
         const jsonResponse = await response.json()
-        //const playlists = jsonResponse.items
-
         setPlaylistList(jsonResponse.items)
       } else{
         check401InvalidCodeError(response)
@@ -197,11 +193,14 @@ function App() {
 
       if(response.ok){
         const jsonResponse = await response.json()
-
         const playlistID = jsonResponse.id
+
         setPlaylist([])
+
         return playlistID
-      } 
+      } else{
+        check401InvalidCodeError(response)
+      }
     } catch(error) {
       console.log(error)
     }
@@ -225,9 +224,9 @@ function App() {
             "uris": playlistUris,
         })
       })
-      if(response.ok){
-        const jsonResponse = await response.json()
-      } 
+      if(!response.ok){
+        check401InvalidCodeError(response)
+      }
     } catch(error){
       console.log(error)
     }
@@ -249,6 +248,9 @@ function App() {
             public: true,
         })
       })
+      if(!response.ok){
+        check401InvalidCodeError(response)
+      }
     } catch(error){
       console.log(error)
     }
@@ -273,7 +275,9 @@ function App() {
       })
       if(response.ok){
         getPlaylists()
-      } 
+      } else{
+        check401InvalidCodeError(response)
+      }
     } catch(error){
       console.log(error)
     }
@@ -293,7 +297,9 @@ function App() {
       if(response.ok){
         clearPlaylist()
         getPlaylists()
-      } 
+      } else{
+        check401InvalidCodeError(response)
+      }
     } catch(error){
       console.log(error)
     }
@@ -315,7 +321,9 @@ function App() {
         })
 
         setPlaylist(playlistTracks)
-      } 
+      } else{
+        check401InvalidCodeError(response)
+      }
     } catch(error){
       console.log(error)
     }
