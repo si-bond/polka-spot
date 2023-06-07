@@ -75,6 +75,7 @@ function Playlist({ playlistData,
     return (
         <div className="playlist" id="playlist">
            <h2>Playlist</h2>
+           Select Playlist<br />
            <select 
                 name="playlists" 
                 id="playlist-select"
@@ -82,16 +83,17 @@ function Playlist({ playlistData,
             >
                 <option value="new-playlist">New Playlist</option>
                 {playlistDropdown}
-            </select>
+            </select><br /><br />
+           Playlist Name<br />
            <input 
                 type="text" 
                 value={playListName} 
                 onChange={handleChange}
                 placeholder="Playlist Name"
-            />
+            /><br /><br />
             <button onClick={handleClick}>{newPlaylist?"Add Playlist":"Update Playlist"}</button>
-            {!newPlaylist&&<button onClick={deletePlay}>Delete</button>}
-            <div className="playlistContainer">
+            {!newPlaylist&&<button onClick={deletePlay}>Delete Playlist</button>}
+            <div className="playlist-container">
              {playlistTracks}    
              </div>       
         </div>

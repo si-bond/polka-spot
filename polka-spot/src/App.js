@@ -350,11 +350,11 @@ function App() {
       <header className="App-header">
         <h1>PolkaSpot</h1>
         <h6>Spotify Playlist Manager</h6>
-        <div className="button-container">
+      </header>
+      <div className="button-container">
           <button id="search-button" onClick={handleModeChange}>Search</button>
           <button id="playlist-button" onClick={handleModeChange}>Playlist</button>
         </div>
-      </header>
       {checkTokenValid()?
       <div className="container">
         <SearchResults 
