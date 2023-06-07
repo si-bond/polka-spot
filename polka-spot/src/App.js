@@ -15,8 +15,6 @@ function App() {
   const [playlistMode, setPlaylistMode] = useState(true)
   const [playlistList, setPlaylistList] = useState([])
 
-  console.log(playList)
-
   function checkTokenValid(){
     //Read token from hash url parameters
     const urlHashString = window.location.hash
@@ -69,7 +67,7 @@ function App() {
     url += '?response_type=token';
     url += '&client_id=' + clientId;
     url += '&redirect_uri=' + redirectUri;
-    url += '&scope=playlist-modify-public playlist-modify-private playlist-read-private playlist-read-public';
+    url += '&scope=playlist-modify-public playlist-modify-private playlist-read-private';
     
 
     //Redirect to spotify login
@@ -103,8 +101,12 @@ function App() {
     setPlaylist(prevPlaylist => prevPlaylist.filter(track => track.uri!==uri))
   }
 
+  function clearPlaylist(){
+    setPlaylist([])
+  }
+
   async function getNewSearch(searchParameter){
-    console.log(searchParameter)
+
     let url = ""
     const accessToken = getValidToken()
 
@@ -121,7 +123,7 @@ function App() {
       const response = await fetch(url)
       if(response.ok){
         const jsonResponse = await response.json()
-        console.log(jsonResponse)
+
         setSongData(jsonResponse)
       } else{
         check401InvalidCodeError(response)
@@ -135,8 +137,12 @@ function App() {
  
   async function addNewPlaylist(playlistName){
     const newPlaylistID = await createNewPlaylists(playlistName)
-    await addTrackToPlaylist(newPlaylistID)
+    if(playList.length>0){
+        await addTrackToPlaylist(newPlaylistID)
+    }
+    
     getPlaylists()
+    //setPlaylist([])
   }
 
 
@@ -156,7 +162,7 @@ function App() {
       if(response.ok){     
         const jsonResponse = await response.json()
         //const playlists = jsonResponse.items
-        console.log(jsonResponse)
+
         setPlaylistList(jsonResponse.items)
       } else{
         check401InvalidCodeError(response)
@@ -190,6 +196,7 @@ function App() {
         const jsonResponse = await response.json()
 
         const playlistID = jsonResponse.id
+        setPlaylist([])
         return playlistID
       } 
     } catch(error) {
@@ -209,16 +216,83 @@ function App() {
         method: "POST",
         headers: {
           'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
             "uris": playlistUris,
-          "position": 0
         })
       })
       if(response.ok){
         const jsonResponse = await response.json()
-        console.log("add")
-        console.log(jsonResponse)
+      } 
+    } catch(error){
+      console.log(error)
+    }
+  }
+
+  async function updatePlaylist(playlistID,playlistName){
+    const accessToken = getValidToken()
+    const fetchUrl = `https://api.spotify.com/v1/playlists/${playlistID}`
+   
+    try{
+      const response = await fetch(fetchUrl,{
+        method: "PUT",
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: playlistName, 
+            public: true,
+        })
+      })
+      if(response.ok){
+        const jsonResponse = await response.json()
+      } 
+    } catch(error){
+      console.log(error)
+    }
+  }
+
+  async function updateTracksToPlaylist(playlistID){
+    const accessToken = getValidToken()
+    const fetchUrl = `https://api.spotify.com/v1/playlists/${playlistID}/tracks`
+   
+    const playlistUris = playList.map(track => track.uri)
+
+    try{
+      const response = await fetch(fetchUrl,{
+        method: "PUT",
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "uris": playlistUris,
+        })
+      })
+      if(response.ok){
+        getPlaylists()
+      } 
+    } catch(error){
+      console.log(error)
+    }
+  }
+
+  async function deletePlaylist(playlistID){
+    const accessToken = getValidToken()
+    const fetchUrl = `https://api.spotify.com/v1/playlists/${playlistID}/followers`
+
+    try{
+      const response = await fetch(fetchUrl,{
+        method: "DELETE",
+        headers: {
+          'Authorization': 'Bearer ' + accessToken,
+        },
+      })
+      if(response.ok){
+        clearPlaylist()
+        getPlaylists()
       } 
     } catch(error){
       console.log(error)
@@ -227,8 +301,6 @@ function App() {
 
   async function getPlaylistTracks(playlistUri){
  
-    console.log(playlistUri)
-
     const accessToken = getValidToken()
     const fetchUrl = `https://api.spotify.com/v1/playlists/${playlistUri}/tracks?access_token=${accessToken}`
    
@@ -237,11 +309,11 @@ function App() {
 
       if(response.ok){
         const jsonResponse = await response.json()
-        console.log(jsonResponse)
+
         const playlistTracks = jsonResponse.items.map(track => {
           return {artist: track.track.artists[0].name, name: track.track.name, uri: track.track.uri}
         })
-        console.log("playlists items")
+
         setPlaylist(playlistTracks)
       } 
     } catch(error){
@@ -285,6 +357,11 @@ function App() {
                 addNewPlaylist={addNewPlaylist}
                 playlistList={playlistList}
                 getPlaylistTracks={getPlaylistTracks}
+                addTrackToPlaylist={addTrackToPlaylist}
+                updateTracksToPlaylist={updateTracksToPlaylist}
+                deletePlaylist={deletePlaylist}
+                updatePlaylist={updatePlaylist}
+                clearPlaylist={clearPlaylist}
             />
           }
         </div>:<div>Please Connect to Spotify<button onClick={connectToSpotify}>Connect</button></div>}

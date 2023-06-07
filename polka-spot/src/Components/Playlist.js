@@ -5,13 +5,16 @@ function Playlist({ playlistData,
                     removeSongFromPlaylist, 
                     addNewPlaylist, 
                     playlistList, 
-                    getPlaylistTracks
+                    getPlaylistTracks,
+                    updateTracksToPlaylist,
+                    deletePlaylist,
+                    updatePlaylist,
+                    clearPlaylist
                 }){
 
-   // console.log(songData)
    const [playListName, setPlaylistName] = useState("")
-
-   console.log(playlistList)
+   const [newPlaylist, setNewPlaylist] = useState(true)
+   const [selectedPlaylistUri, setSelectedPlaylistUri] = useState("")
 
    function handleChange(event){
     const changedValue = event.target.value
@@ -22,26 +25,34 @@ function Playlist({ playlistData,
 
     function handleClick(event){
 
-        const targetEl = event.target.id
-    
-        console.log(targetEl)
-        if(targetEl==="add-playlist"){
-            console.log("Add playlist")
-        } else if(targetEl==="update-playlist"){
-            console.log("Update playlist")
-        } else if(targetEl==="delete-playlist"){
-            console.log("Delete playlist")
-        }
+        if(newPlaylist){
+            addNewPlaylist(playListName)
+        } else {
+            updatePlaylist(selectedPlaylistUri,playListName)
+            updateTracksToPlaylist(selectedPlaylistUri)
+        }   
+    }
 
-        addNewPlaylist(playListName)
+    function deletePlay(){
+        deletePlaylist(selectedPlaylistUri)
     }
 
    function handleSelect(event){
-    const playlistUri = event.target.value
-    if(!playlistUri){
-        return
-    }
-    getPlaylistTracks(playlistUri)
+        const selectedElement = event.target
+        const playlistUri = selectedElement.value
+        const playlistName = selectedElement.options[selectedElement.selectedIndex].text;
+
+
+        if(playlistUri==="new-playlist"){
+            setNewPlaylist(true)
+            setPlaylistName("")
+            clearPlaylist()
+            return
+        }
+        getPlaylistTracks(playlistUri)
+        setSelectedPlaylistUri(playlistUri)
+        setPlaylistName(playlistName)
+        setNewPlaylist(false)
    }
 
 
@@ -58,7 +69,7 @@ function Playlist({ playlistData,
     })
 
     const playlistDropdown = playlistList.map(playlist => {
-        return <option value={playlist.id}>{playlist.name}</option>
+        return <option key={playlist.id} value={playlist.id}>{playlist.name}</option>
     })
 
     return (
@@ -69,7 +80,7 @@ function Playlist({ playlistData,
                 id="playlist-select"
                 onChange={handleSelect}
             >
-                <option>New Playlist</option>
+                <option value="new-playlist">New Playlist</option>
                 {playlistDropdown}
             </select>
            <input 
@@ -78,9 +89,8 @@ function Playlist({ playlistData,
                 onChange={handleChange}
                 placeholder="Playlist Name"
             />
-            <button onClick={handleClick} id="add-playlist">Add Playlist</button>
-            <button onClick={handleClick} id="update-playlist">Update Playlist</button>
-            <button onClick={handleClick} id="delete-playlist">Delete</button>
+            <button onClick={handleClick}>{newPlaylist?"Add Playlist":"Update Playlist"}</button>
+            {!newPlaylist&&<button onClick={deletePlay}>Delete</button>}
            {playlistTracks}           
         </div>
     )
