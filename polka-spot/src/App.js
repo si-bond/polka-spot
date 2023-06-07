@@ -47,6 +47,7 @@ function App() {
     const currentTime = new Date();
     const tokenDuration = (currentTime - tokenTimestamp)/1000
 
+
     if(storedAccessToken && tokenDuration<3600){
       return storedAccessToken
     } else{
@@ -61,7 +62,7 @@ function App() {
     if(validToken){
       return validToken
     } else{
-      connectToSpotify()
+      return false
     }
   }
 
@@ -152,6 +153,10 @@ function App() {
 
   async function getPlaylists(){
     const accessToken = getValidToken()
+
+    if(!accessToken){
+      return
+    }
   //  const urlToFetch = `https://api.spotify.com/v1/me/playlists?access_token=${accessToken}`
     const urlToFetch = `https://api.spotify.com/v1/me/playlists`
     try {
@@ -356,28 +361,27 @@ function App() {
           <button id="playlist-button" onClick={handleModeChange}>Playlist</button>
         </div>
       {checkTokenValid()?
-      <div className="container">
-        <SearchResults 
-          songData={songData} 
-          addSongToPlaylist={addSongToPlaylist} 
-          getNewSearch={getNewSearch}
+        <div className="container">
+
+          <SearchResults 
+            songData={songData} 
+            addSongToPlaylist={addSongToPlaylist} 
+            getNewSearch={getNewSearch}
+            />
+          <Playlist 
+                playlistData={playList} 
+                removeSongFromPlaylist={removeSongFromPlaylist}
+                addNewPlaylist={addNewPlaylist}
+                playlistList={playlistList}
+                getPlaylistTracks={getPlaylistTracks}
+                addTrackToPlaylist={addTrackToPlaylist}
+                updateTracksToPlaylist={updateTracksToPlaylist}
+                deletePlaylist={deletePlaylist}
+                updatePlaylist={updatePlaylist}
+                clearPlaylist={clearPlaylist}
           />
-        
-        <Playlist 
-              playlistData={playList} 
-              removeSongFromPlaylist={removeSongFromPlaylist}
-              addNewPlaylist={addNewPlaylist}
-              playlistList={playlistList}
-              getPlaylistTracks={getPlaylistTracks}
-              addTrackToPlaylist={addTrackToPlaylist}
-              updateTracksToPlaylist={updateTracksToPlaylist}
-              deletePlaylist={deletePlaylist}
-              updatePlaylist={updatePlaylist}
-              clearPlaylist={clearPlaylist}
-          />
-        
-      </div>:
-      <div>Please Connect to Spotify<button onClick={connectToSpotify}>Connect</button></div>}
+        </div>:
+      <div className="connect-container"><button onClick={connectToSpotify}>Connect to Spotify</button></div>}
     </div>
   );
 }

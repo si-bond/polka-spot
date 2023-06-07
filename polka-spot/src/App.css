@@ -44,6 +44,26 @@ h6{
   border-radius: 5px;
 }
 
+.connect-container{
+  height: calc(100vh - 300px);
+  position: absolute;
+  top: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  gap: 10px;
+}
+
+.connect-container button{
+  align-self: center;
+  background-color: #564946;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 3px;
+}
+
 .search-results, .playlist{
   background-color: whitesmoke;
   flex-grow: 1;
