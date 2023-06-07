@@ -20,9 +20,21 @@ function Playlist({ playlistData,
 
    }
 
-   function handleAddPlaylistClick(){
+    function handleClick(event){
+
+        const targetEl = event.target.id
+    
+        console.log(targetEl)
+        if(targetEl==="add-playlist"){
+            console.log("Add playlist")
+        } else if(targetEl==="update-playlist"){
+            console.log("Update playlist")
+        } else if(targetEl==="delete-playlist"){
+            console.log("Delete playlist")
+        }
+
         addNewPlaylist(playListName)
-   }
+    }
 
    function handleSelect(event){
     const playlistUri = event.target.value
@@ -66,7 +78,9 @@ function Playlist({ playlistData,
                 onChange={handleChange}
                 placeholder="Playlist Name"
             />
-           <button onClick={handleAddPlaylistClick}>Add Playlist</button>
+            <button onClick={handleClick} id="add-playlist">Add Playlist</button>
+            <button onClick={handleClick} id="update-playlist">Update Playlist</button>
+            <button onClick={handleClick} id="delete-playlist">Delete</button>
            {playlistTracks}           
         </div>
     )
